@@ -1,0 +1,78 @@
+import java.util.*;
+import java.io.*;
+
+public class Solution {
+    static class Rust {
+
+        HashMap<Integer, HashSet<Integer>> graph;
+
+        public Rust(int v) {
+            graph = new HashMap<Integer, HashSet<Integer>>();
+            for (int i = 1; i <= v; ++i)
+                graph.put(i, new HashSet<Integer>());
+        }
+
+        public void addEdge(int v1, int v2) {
+            graph.get(v1).add(v2);
+            graph.get(v2).add(v1);
+        }
+
+        public int[] dijkstas(int s) {
+            int[] seen = new int[graph.size() + 1];
+            int[] distances = new int[graph.size() + 1];
+            HashSet<Integer> unseen = new HashSet<Integer>();
+            int processing = 1;
+            int emptySlot = 2;
+
+            seen[processing] = s;
+            distances[seen[processing]] = 0;
+            distances[0] = -1;
+            for (int i = 1; i <= graph.size(); ++i)
+                if (i != s)
+                    unseen.add(i);
+
+            while (unseen.size() > 0) {
+                int node = seen[processing];
+                ++processing;
+                HashSet<Integer> todelete = new HashSet<Integer>();
+                for (int next : unseen) {
+                    if (graph.get(node).contains(next))
+                        continue;
+                    todelete.add(next);
+                    distances[next] = distances[node] + 1;
+                    seen[emptySlot] = next;
+                    ++emptySlot;
+                }
+                for (int next : todelete)
+                    unseen.remove(next);
+            }
+            assert (emptySlot == seen.length);
+            return distances;
+        }
+    }
+
+    static void path(int v, int m, Scanner sc) {
+        Rust graph = new Rust(v);
+        while (m > 0) {
+            --m;
+            graph.addEdge(sc.nextInt(), sc.nextInt());
+        }
+        int s = sc.nextInt();
+        for (int dist : graph.dijkstas(s)) {
+            if (dist > 0)
+                System.out.print(dist + " ");
+        }
+        System.out.println();
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int n = sc.nextInt();
+        while (n > 0) {
+            --n;
+            path(sc.nextInt(), sc.nextInt(), sc);
+        }
+    }
+
+
+}
